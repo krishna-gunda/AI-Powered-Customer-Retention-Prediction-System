@@ -10,6 +10,7 @@ import logging
 from logging_code import setup_logging
 logger=setup_logging('main')
 from sklearn.model_selection import train_test_split
+from missing_data import handling_data
 
 
 class CHURN():
@@ -62,7 +63,15 @@ class CHURN():
 
     def handling_missing_data(self):
         try:
-            pass
+            logger.info(f'Before handling the null values')
+            logger.info(f'the no of null values in the x_train[TotalCharges]:{self.x_train['TotalCharges'].isnull().sum()}')
+            logger.info(f'the no of null values in the x_test[totalcharges]:{self.x_test['TotalCharges'].isnull().sum()}')
+            self.x_train,self.x_test=handling_data(self.x_train,self.x_test)
+            logger.info(f'After handling the null values')
+            logger.info(
+                f'the no of null values in the x_train[TotalCharges]:{self.x_train['TotalCharges'].isnull().sum()}')
+            logger.info(
+                f'the no of null values in the x_test[totalcharges]:{self.x_test['TotalCharges'].isnull().sum()}')
         except Exception as e:
             error_type, error_msg, error_line = sys.exc_info()
             logger.info(f'error_type:{error_type},error_msg:{error_msg},error_line:{error_line}')
