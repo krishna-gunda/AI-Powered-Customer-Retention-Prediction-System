@@ -33,7 +33,8 @@ class CHURN():
             logger.info("-"*100)
             logger.info("dividing the data into dependent and independent columns")
             self.y = self.df['Churn']
-            self.x=self.df.drop("Churn",axis=1)
+            self.x=self.df.drop(["Churn","customerID"],axis=1)
+
 
             logger.info(f'independent columns:{self.x.columns}')
             logger.info(f'dependent columns:{self.y.name}') # since it is single column we use name
@@ -65,7 +66,7 @@ class CHURN():
         try:
             logger.info(f'Before handling the null values')
             logger.info(f'the no of null values in the x_train[TotalCharges]:{self.x_train['TotalCharges'].isnull().sum()}')
-            logger.info(f'the no of null values in the x_test[totalcharges]:{self.x_test['TotalCharges'].isnull().sum()}')
+            logger.info(f'the no of null values in the x_test[TotalCharges]:{self.x_test['TotalCharges'].isnull().sum()}')
             self.x_train,self.x_test=handling_data(self.x_train,self.x_test)
             logger.info(f'After handling the null values')
             logger.info(
@@ -75,6 +76,23 @@ class CHURN():
         except Exception as e:
             error_type, error_msg, error_line = sys.exc_info()
             logger.info(f'error_type:{error_type},error_msg:{error_msg},error_line:{error_line}')
+    def data_seperation(self):
+        try:
+            logger.info("----------------------------------------------------------")
+            self.x_train_categorical=self.x_train.select_dtypes(['object'])
+            self.x_test_categorical=self.x_test.select_dtypes(['object'])
+            self.x_train_numerical=self.x_train.select_dtypes(['number'])
+            self.x_test_numerical=self.x_test.select_dtypes(['number'])
+            logger.info(self.x_train_numerical.columns)
+            logger.info(self.x_test_numerical.columns)
+            logger.info(self.x_train_categorical.columns)
+            logger.info(self.x_test_categorical.columns)
+
+        except Exception as e:
+            error_type, error_msg, error_line = sys.exc_info()
+            logger.info(f'error_type:{error_type},error_msg:{error_msg},error_line:{error_line}')
+
+
 
 
 
@@ -84,6 +102,7 @@ if __name__ == '__main__':
     try:
         obj=CHURN('WA_Fn-UseC_-Telco-Customer-Churn (1).csv')
         obj.handling_missing_data()
+        obj.data_seperation()
     except Exception as e:
         err_type,err_msg,err_line=sys.exc_info()
         logger.info(f'error_type:{err_type},error_msg:{err_msg},error_line:{err_line}')
