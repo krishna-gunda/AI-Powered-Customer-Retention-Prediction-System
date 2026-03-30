@@ -118,7 +118,12 @@ class CHURN():
 
     def encoder(self):
         try:
-           one_hot_encoder(self.x_train_categorical,self.x_test_categorical)
+            logger.info(f'before one hot encoding x_train column names :{self.x_train_categorical.columns}')
+            logger.info(f'before one hot encoding x_test column names :{self.x_test_categorical.columns}')
+            self.x_train_categorical,self.x_test_categorical=one_hot_encoder(self.x_train_categorical,self.x_test_categorical)
+            logger.info(f'after one hot encoding x_train column names :{self.x_train_categorical.columns}')
+            logger.info(f'after one hot encoding x_test column names :{self.x_test_categorical.columns}')
+
         except Exception as e:
             error_type,error_msg,error_line=sys.exc_info()
             logger.info(f'error type{error_type},error msg {error_msg} ,error_line {error_line}')

@@ -13,19 +13,21 @@ from sklearn.preprocessing import OneHotEncoder,OrdinalEncoder
 
 def one_hot_encoder(x_train,x_test):
     try:
+        logger.info(f'before one hot encoding x_train column names :{x_train.columns}')
+        logger.info(f'before one hot encoding x_test column names :{x_test.columns}')
         one=OneHotEncoder(drop='first')
         one.fit(x_train[['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines',
        'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
        'TechSupport', 'StreamingTV', 'StreamingMovies',
-       'PaperlessBilling', 'PaymentMethod']])
+       'PaperlessBilling', 'PaymentMethod','sim_column']])
         values_train=one.transform(x_train[['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines',
        'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
        'TechSupport', 'StreamingTV', 'StreamingMovies',
-       'PaperlessBilling', 'PaymentMethod']]).toarray()
+       'PaperlessBilling', 'PaymentMethod','sim_column']]).toarray()
         values_test = one.transform(x_test[['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines',
                                               'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
                                               'TechSupport', 'StreamingTV', 'StreamingMovies',
-                                              'PaperlessBilling', 'PaymentMethod']]).toarray()
+                                              'PaperlessBilling', 'PaymentMethod','sim_column']]).toarray()
         t1=pd.DataFrame(values_train)
         t2=pd.DataFrame(values_test)
         t1.columns=one.get_feature_names_out()
@@ -36,17 +38,36 @@ def one_hot_encoder(x_train,x_test):
         t2.reset_index(drop=True,inplace=True)
         x_train=pd.concat([x_train,t1],axis=1)
         x_test=pd.concat([x_test,t2],axis=1)
-        x_train.drop(columns=['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines',
+        x_train=x_train.drop(['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines',
                                               'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
                                               'TechSupport', 'StreamingTV', 'StreamingMovies',
-                                              'PaperlessBilling', 'PaymentMethod'],axis=1)
-        x_test.drop(columns=['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines',
+                                              'PaperlessBilling', 'PaymentMethod','sim_column'],axis=1)
+        x_test=x_test.drop(['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines',
                                               'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
                                               'TechSupport', 'StreamingTV', 'StreamingMovies',
-                                              'PaperlessBilling', 'PaymentMethod'],axis=1)
+                                              'PaperlessBilling', 'PaymentMethod','sim_column'],axis=1)
 
-        ordinal=OrdinalEncoder()
-        ordinal.fit(x_train[[]])
+        ordinal=OrdinalEncoder(categories=[['Month-to-month', 'One year', 'Two year']])
+        ordinal.fit(x_train[['Contract']])
+        results_x_train=ordinal.transform(x_train[['Contract']])
+        results_x_test=ordinal.transform(x_test[['Contract']])
+        t3=pd.DataFrame(results_x_train)
+        t4=pd.DataFrame(results_x_test)
+        t3.columns=ordinal.get_feature_names_out()
+        t4.columns=ordinal.get_feature_names_out()
+        t3.reset_index(drop=True, inplace=True)
+        t4.reset_index(drop=True, inplace=True)
+        x_train = pd.concat([x_train, t3], axis=1)
+        x_test = pd.concat([x_test, t4], axis=1)
+        x_train=x_train.drop(['Contract'],axis=1)
+        x_test=x_test.drop(['Contract'],axis=1)
+        logger.info(f'after one hot encoding x_train column names :{x_train.columns}')
+        logger.info(f'after one hot encoding x_test column names :{x_test.columns}')
+        return x_train,x_test
+
+
+
+
 
     except Exception as e:
         error_type, error_msg, error_line = sys.exc_info()
