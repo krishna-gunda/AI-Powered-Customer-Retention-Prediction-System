@@ -11,7 +11,9 @@ from logging_code import setup_logging
 logger=setup_logging('main')
 from sklearn.model_selection import train_test_split
 from missing_data import handling_data
-
+from var_out import variable_outliers
+from f_m import feature_engineering
+from label_encoder import one_hot_encoder
 
 class CHURN():
     def __init__(self,path):
@@ -93,8 +95,33 @@ class CHURN():
             logger.info(f'error_type:{error_type},error_msg:{error_msg},error_line:{error_line}')
 
 
+    def variable_transformation(self):
+        try:
+            logger.info(f'before columns:{self.x_train_numerical.columns}')
+            logger.info(f'before columns:{self.x_test_numerical.columns}')
+            self.x_train_numerical,self.x_test_numerical=variable_outliers(self.x_train_numerical,self.x_test_numerical)
+            logger.info(f'after columns:{self.x_train_numerical.columns}')
+            logger.info(f'after columns:{self.x_test_numerical.columns}')
 
+        except Exception as e:
+            error_type,error_msg,error_line=sys.exc_info()
+            logger.info(f'error type{error_type},error msg {error_msg} ,error_line {error_line}')
+    def feature_selection(self):
+        try:
+            logger.info(f'x_train_numerical columns={self.x_train_numerical.columns}')
+            self.x_train_numerical,self.x_test_numerical,self.y_train=feature_engineering(self.x_train_numerical,self.x_test_numerical,self.y_train)
+            logger.info(f'x_train_numerical columns={self.x_train_numerical.columns}')
+            logger.info(f'x_test_numerical_columns={self.x_test_numerical.columns}')
+        except Exception as e:
+            error_type,error_msg,error_line=sys.exc_info()
+            logger.info(f'error type{error_type},error msg {error_msg} ,error_line {error_line}')
 
+    def encoder(self):
+        try:
+           one_hot_encoder(self.x_train_categorical,self.x_test_categorical)
+        except Exception as e:
+            error_type,error_msg,error_line=sys.exc_info()
+            logger.info(f'error type{error_type},error msg {error_msg} ,error_line {error_line}')
 
 
 
@@ -103,6 +130,9 @@ if __name__ == '__main__':
         obj=CHURN('WA_Fn-UseC_-Telco-Customer-Churn (1).csv')
         obj.handling_missing_data()
         obj.data_seperation()
+        obj.variable_transformation()
+        obj.feature_selection()
+        obj.encoder()
     except Exception as e:
         err_type,err_msg,err_line=sys.exc_info()
         logger.info(f'error_type:{err_type},error_msg:{err_msg},error_line:{err_line}')
