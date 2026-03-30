@@ -123,10 +123,21 @@ class CHURN():
             self.x_train_categorical,self.x_test_categorical=one_hot_encoder(self.x_train_categorical,self.x_test_categorical)
             logger.info(f'after one hot encoding x_train column names :{self.x_train_categorical.columns}')
             logger.info(f'after one hot encoding x_test column names :{self.x_test_categorical.columns}')
+            logger.info(f'------------------------------combining the train data and test data-----------------------------------------')
+            self.x_train_numerical.reset_index(drop=True)
+            self.x_train_categorical.reset_index(drop=True)
+            self.x_test_numerical.reset_index(drop=True)
+            self.x_test_categorical.reset_index(drop=True)
+            self.x_train_data=pd.concat([self.x_train_categorical,self.x_train_numerical],axis=1)
+            self.x_test_data=pd.concat([self.x_test_categorical,self.x_test_numerical],axis=1)
+
+            logger.info(f'total columns in x_train={self.x_train_data.shape}')
+            logger.info(f'total columns in x_test={self.x_test_data.shape}')
 
         except Exception as e:
             error_type,error_msg,error_line=sys.exc_info()
             logger.info(f'error type{error_type},error msg {error_msg} ,error_line {error_line}')
+
 
 
 
