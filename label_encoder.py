@@ -13,6 +13,8 @@ from sklearn.preprocessing import OneHotEncoder,OrdinalEncoder
 
 def one_hot_encoder(x_train,x_test):
     try:
+        logger.info(f'total columns in x_train={x_train.shape}')
+        logger.info(f'total columns in x_test={x_test.shape}')
         logger.info(f'before one hot encoding x_train column names :{x_train.columns}')
         logger.info(f'before one hot encoding x_test column names :{x_test.columns}')
         one=OneHotEncoder(drop='first')
@@ -63,6 +65,8 @@ def one_hot_encoder(x_train,x_test):
         x_test=x_test.drop(['Contract'],axis=1)
         logger.info(f'after one hot encoding x_train column names :{x_train.columns}')
         logger.info(f'after one hot encoding x_test column names :{x_test.columns}')
+        logger.info(f'total columns in x_train={x_train.shape}')
+        logger.info(f'total columns in x_test={x_test.shape}')
         return x_train,x_test
 
 

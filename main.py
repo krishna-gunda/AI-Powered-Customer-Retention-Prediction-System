@@ -14,6 +14,10 @@ from missing_data import handling_data
 from var_out import variable_outliers
 from f_m import feature_engineering
 from label_encoder import one_hot_encoder
+from scipy import stats
+import seaborn as sns
+from imblearn.over_sampling import SMOTE
+from feature_scaling import fs
 
 class CHURN():
     def __init__(self,path):
@@ -100,8 +104,17 @@ class CHURN():
             logger.info(f'before columns:{self.x_train_numerical.columns}')
             logger.info(f'before columns:{self.x_test_numerical.columns}')
             self.x_train_numerical,self.x_test_numerical=variable_outliers(self.x_train_numerical,self.x_test_numerical)
+            ## visualizing the columns whether they have any outliers
+            '''for i in self.x_train_numerical.columns:
+                plt.figure(figsize=(6, 4))
+                plt.title(f'Outliers in {i}')
+
+                sns.boxplot(x=self.x_train_numerical[i])
+
+                plt.show()'''
             logger.info(f'after columns:{self.x_train_numerical.columns}')
             logger.info(f'after columns:{self.x_test_numerical.columns}')
+
 
         except Exception as e:
             error_type,error_msg,error_line=sys.exc_info()
@@ -124,10 +137,12 @@ class CHURN():
             logger.info(f'after one hot encoding x_train column names :{self.x_train_categorical.columns}')
             logger.info(f'after one hot encoding x_test column names :{self.x_test_categorical.columns}')
             logger.info(f'------------------------------combining the train data and test data-----------------------------------------')
-            self.x_train_numerical.reset_index(drop=True)
-            self.x_train_categorical.reset_index(drop=True)
-            self.x_test_numerical.reset_index(drop=True)
-            self.x_test_categorical.reset_index(drop=True)
+            self.x_train_numerical.reset_index(drop=True, inplace=True)
+            self.x_train_categorical.reset_index(drop=True, inplace=True)
+            self.x_test_numerical.reset_index(drop=True, inplace=True)
+            self.x_test_categorical.reset_index(drop=True, inplace=True)
+
+
             self.x_train_data=pd.concat([self.x_train_categorical,self.x_train_numerical],axis=1)
             self.x_test_data=pd.concat([self.x_test_categorical,self.x_test_numerical],axis=1)
 
@@ -138,7 +153,22 @@ class CHURN():
             error_type,error_msg,error_line=sys.exc_info()
             logger.info(f'error type{error_type},error msg {error_msg} ,error_line {error_line}')
 
+    def balance(self):
+        try:
+            logger.info(f"Number of Rows for Good Customer {1} : {sum(self.y_train == 1)}")
+            logger.info(f"Number of Rows for Bad Customer {0} : {sum(self.y_train == 0)}")
+            logger.info(f"Training data size : {self.x_train_data.shape}")
+            sm = SMOTE(random_state=42)
 
+            self.training_data_bal,self.y_train_bal = sm.fit_resample(self.x_train_data , self.y_train)
+
+            logger.info(f"Number of Rows for Good Customer {1} : {sum(self.y_train_bal == 1)}")
+            logger.info(f"Number of Rows for Bad Customer {0} : {sum(self.y_train_bal == 0)}")
+            logger.info(f"Training data size : {self.training_data_bal.shape}")
+            fs(self.training_data_bal,self.y_train,self.x_test_data,self.y_test)
+        except Exception as e:
+            error_type,error_msg,error_line=sys.exc_info()
+            logger.info(f'error_type:{error_type},error_msg:{error_msg},error_line {error_line}')
 
 
 if __name__ == '__main__':
