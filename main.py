@@ -165,7 +165,7 @@ class CHURN():
             logger.info(f"Number of Rows for Good Customer {1} : {sum(self.y_train_bal == 1)}")
             logger.info(f"Number of Rows for Bad Customer {0} : {sum(self.y_train_bal == 0)}")
             logger.info(f"Training data size : {self.training_data_bal.shape}")
-            fs(self.training_data_bal,self.y_train,self.x_test_data,self.y_test)
+            fs(self.training_data_bal,self.y_train_bal,self.x_test_data,self.y_test)
         except Exception as e:
             error_type,error_msg,error_line=sys.exc_info()
             logger.info(f'error_type:{error_type},error_msg:{error_msg},error_line {error_line}')
@@ -179,6 +179,7 @@ if __name__ == '__main__':
         obj.variable_transformation()
         obj.feature_selection()
         obj.encoder()
+        obj.balance()
     except Exception as e:
         err_type,err_msg,err_line=sys.exc_info()
         logger.info(f'error_type:{err_type},error_msg:{err_msg},error_line:{err_line}')

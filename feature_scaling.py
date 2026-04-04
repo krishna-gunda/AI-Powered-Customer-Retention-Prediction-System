@@ -13,6 +13,7 @@ from sklearn.preprocessing import StandardScaler # z_score
 from all_models import common
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score,classification_report,confusion_matrix
+from sklearn.model_selection import GridSearchCV
 import pickle
 def fs(X_train , y_train , X_test , y_test):
     try:
@@ -31,8 +32,39 @@ def fs(X_train , y_train , X_test , y_test):
             pickle.dump(sc,f)
 
         logger.info(f"{X_train_sc}")
-        # common(X_train_sc,y_train,X_test_sc,y_test)
-        reg = LogisticRegression()
+        common(X_train_sc,y_train,X_test_sc,y_test)
+        '''
+        best_model.fit(X_train_sc,y_train)
+        logger.info(f'Test accuracy:{accuracy_score(y_test,best_model.predict(X_test_sc))}')
+
+
+        #finding best parameters for the best model
+        parameter_grid = {
+            "penalty": ["l1", "l2"],
+            "C": [0.01, 0.1, 1, 10],
+            "solver": ["liblinear", "saga"],
+            "max_iter": [200, 500],
+            "class_weight": [None, "balanced"]
+        }
+        lr=best_model
+        grid=GridSearchCV(estimator=lr,param_grid=parameter_grid,scoring='roc_auc',cv=5,n_jobs=-1)
+        grid.fit(X_train_sc, y_train)
+        logger.info(f'Best Parameters:, {grid.best_params_}')
+        logger.info(f'Best AUC:, {grid.best_score_}')'''
+
+
+
+
+
+
+        logger.info(f'best parameters for logistic regression : C: 10, class_weight: None, max_iter: 200, penalty: l2, solver: saga')
+        reg = LogisticRegression(
+            C=10,
+            class_weight=None,
+            max_iter=200,
+            penalty='l2',
+            solver='saga'
+        )
         reg.fit(X_train_sc,y_train) # Training completed
         logger.info(f"Test Accuracy : {accuracy_score(y_test,reg.predict(X_test_sc))}")
         logger.info(f"Test Confusion Matrix : {confusion_matrix(y_test,reg.predict(X_test_sc))}")
